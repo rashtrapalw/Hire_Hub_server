@@ -107,3 +107,39 @@ router.delete('/:id', auth, permit('admin'), async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+// Recruiter: update applicant status
+router.put(
+  '/:jobId/applicants/:applicantId/status',
+  auth,
+  permit('recruiter', 'admin'),
+  async (req, res) => {
+    try {
+      const { status } = req.body
+      const job = await Job.findById(req.params.jobId)
+
+      if (!job) return res.status(404).json({ message: 'Job not found' })
+
+      // recruiter can update only own job
+      if (
+        req.user.role === 'recruiter' &&
+        job.recruiter.toString() !== req.user._id.toString()
+      ) {
+        return res.status(403).json({ message: 'Not allowed' })
+      }
+
+      const applicant = job.applicants.id(req.params.applicantId)
+      if (!applicant)
+        return res.status(404).json({ message: 'Applicant not found' })
+
+      applicant.status = status
+      await job.save()
+
+      res.json({ message: 'Status updated', applicant })
+    } catch (err) {
+      res.status(500).send('Server error')
+    }
+  }
+)
