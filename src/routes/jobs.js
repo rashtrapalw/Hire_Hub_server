@@ -30,15 +30,29 @@ router.post('/', auth, permit('recruiter', 'admin'), async (req, res) => {
   }
 });
 
-// Get all jobs
+// // Get all jobs
+// router.get('/', async (req, res) => {
+//   try {
+//     const jobs = await Job.find().populate('recruiter', 'name email');
+//     res.json(jobs);
+//   } catch (err) {
+//     res.status(500).send('Server error');
+//   }
+// });
+
 router.get('/', async (req, res) => {
   try {
-    const jobs = await Job.find().populate('recruiter', 'name email');
-    res.json(jobs);
+    const jobs = await Job.find()
+      .populate('recruiter', 'name email')
+      .populate('applicants.candidate', 'name email')
+
+    res.json(jobs)
   } catch (err) {
-    res.status(500).send('Server error');
+    res.status(500).send('Server error')
   }
-});
+})
+
+
 
 // Get single job
 router.get('/:id', async (req, res) => {
