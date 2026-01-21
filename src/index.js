@@ -12,6 +12,10 @@ app.use(express.json());
 // connect DB
 connectDB(process.env.MONGO_URI || 'mongodb://localhost:27017/hirehub');
 
+app.get('/', (req, res) => {
+    res.send('Hello, World! Your Express server is running.');
+});
+
 // routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
